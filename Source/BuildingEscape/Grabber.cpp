@@ -1,6 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
+#include "GameFramework/PlayerController.h"
+#include "Engine/World.h"
+#include "DrawDebugHelpers.h"
 #include "Grabber.h"
 
 
@@ -19,9 +21,6 @@ UGrabber::UGrabber()
 void UGrabber::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
-	
 }
 
 
@@ -30,6 +29,27 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	FVector PlayerLocation;
+	FRotator PlayerRotation;
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+		PlayerLocation, 
+		PlayerRotation
+	);
+
+	// UE_LOG(LogTemp, Warning, TEXT("PlayerLocation: %f,%f,%f"), PlayerLocation.X, PlayerLocation.Y, PlayerLocation.Z);
+	// UE_LOG(LogTemp, Warning, TEXT("PlayerPotation: %f,%f,%f"), PlayerRotation.Roll, PlayerRotation.Pitch, PlayerRotation.Yaw);
+
+	FVector LineTraceEnd = PlayerLocation + PlayerRotation.Vector() * Reach;
+
+	DrawDebugLine(
+		GetWorld(),
+		PlayerLocation,
+		LineTraceEnd,
+		FColor(0, 255, 0),
+		false,
+		0.f,
+		0,
+		5.f
+	);
 }
 
