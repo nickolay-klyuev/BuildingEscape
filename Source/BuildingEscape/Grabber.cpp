@@ -5,6 +5,7 @@
 #include "DrawDebugHelpers.h"
 #include "Grabber.h"
 
+#define OUT
 
 // Sets default values for this component's properties
 UGrabber::UGrabber()
@@ -21,6 +22,12 @@ UGrabber::UGrabber()
 void UGrabber::BeginPlay()
 {
 	Super::BeginPlay();
+
+	PhysicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
+	if (!PhysicsHandle)
+	{
+		UE_LOG(LogTemp, Error, TEXT("PhysicsHandle == NULL in %s actor"), *GetOwner()->GetName());
+	}
 }
 
 
@@ -32,8 +39,8 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	FVector PlayerLocation;
 	FRotator PlayerRotation;
 	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
-		PlayerLocation, 
-		PlayerRotation
+		OUT PlayerLocation, 
+		OUT PlayerRotation
 	);
 
 	// UE_LOG(LogTemp, Warning, TEXT("PlayerLocation: %f,%f,%f"), PlayerLocation.X, PlayerLocation.Y, PlayerLocation.Z);
@@ -51,5 +58,23 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 		0,
 		5.f
 	);
+
+	FHitResult Hit;
+	FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
+
+	GetWorld()->LineTraceSingleByObjectType(
+		OUT Hit,
+		PlayerLocation,
+		LineTraceEnd,
+		FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody),
+		TraceParams
+	);
+	
+	AActor* ActorHit = Hit.GetActor();
+
+	if (ActorHit)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Hitted actor name: %s"), *ActorHit->GetName());
+	}
 }
 
