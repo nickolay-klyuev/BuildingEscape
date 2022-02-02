@@ -35,5 +35,7 @@ private:
 	void SetupInputComponent();
 
 	FHitResult GetFirstPhysicsBody() const;
+	FVector GetLineTraceEnd() const;
+	FVector GetPlayerLocation() const;
 	
 };
